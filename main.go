@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "backend/migrations"
+	_ "backend/pb_migrations"
 	"log"
 
 	"github.com/pocketbase/dbx"
