@@ -22,7 +22,7 @@ COPY --from=builder /app/pb_migrations /pb/pb_migrations
 # Création du volume pour les données (important pour la persistance)
 VOLUME /pb/pb_data
 
-EXPOSE 8080
+EXPOSE 8090
 
 # Commande de lancement
 CMD ["/pb/pocketbase", "serve"]

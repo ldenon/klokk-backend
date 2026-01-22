@@ -5,11 +5,11 @@ services:
       dockerfile: Dockerfile
     container_name: klokk-backend
     restart: always
-    expose:
-      - 8090
+    ports:
+      - "8090:8090"
     volumes:
       - pb_data:/pb/pb_data
-    environnement:
+    environment:
       - POCKETBASE_PORT_NUMBER=8090
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8090/_/"]
