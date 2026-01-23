@@ -25,4 +25,4 @@ VOLUME /pb/pb_data
 EXPOSE 8090
 
 # Commande de lancement
-CMD ["/pb/pocketbase", "serve"]
+CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8080"]
