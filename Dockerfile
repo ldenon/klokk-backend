@@ -5,7 +5,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 # Compilation du binaire (nommé 'pocketbase')
-RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o pocketbase
+RUN CGO_ENABLED=0 go build -o pocketbase
 
 # Étape 2 : Image finale légère
 FROM alpine:latest
@@ -25,4 +25,4 @@ VOLUME /pb/pb_data
 EXPOSE 8090
 
 # Commande de lancement
-CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8080"]
+CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8090"]
