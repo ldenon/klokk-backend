@@ -907,7 +907,7 @@ func init() {
 						"id": "date2782324286",
 						"max": "",
 						"min": "",
-						"name": "timestamp",
+						"name": "occuredAt",
 						"presentable": false,
 						"required": true,
 						"system": false,
@@ -929,7 +929,7 @@ func init() {
 						]
 					},
 					{
-						"cascadeDelete": false,
+						"cascadeDelete": true,
 						"collectionId": "pbc_3660498186",
 						"hidden": false,
 						"id": "relation961590774",
@@ -1007,7 +1007,7 @@ func init() {
 						"min": 0,
 						"name": "name",
 						"pattern": "",
-						"presentable": false,
+						"presentable": true,
 						"primaryKey": false,
 						"required": false,
 						"system": false,
@@ -1106,7 +1106,7 @@ func init() {
 						"name": "created",
 						"onCreate": true,
 						"onUpdate": false,
-						"presentable": true,
+						"presentable": false,
 						"system": false,
 						"type": "autodate"
 					},

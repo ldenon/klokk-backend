@@ -14,8 +14,6 @@ func main() {
 	app := pocketbase.New()
 
 	migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
-		// enable auto creation of migration files when making collection changes in the Dashboard
-		// (the isGoRun check is to enable it only during development)
 		Automigrate: false,
 	})
 
@@ -28,6 +26,7 @@ func main() {
 		return se.Next()
 	})
 
+	// Checks if user has no other active session before create a new one
 	app.OnRecordCreateRequest("sessions").BindFunc(func(e *core.RecordRequestEvent) error {
 		if e.HasSuperuserAuth() {
 			return e.Next()
@@ -49,6 +48,28 @@ func main() {
 		return e.Next()
 	})
 
+	// Create a start event after session creation
+	app.OnRecordAfterCreateSuccess("sessions").BindFunc(func(e *core.RecordEvent) error {
+
+		collection, err := app.FindCollectionByNameOrId("session_events")
+		if err != nil {
+			return err
+		}
+		record := core.NewRecord(collection)
+
+		record.Set("sessionId", e.Record.Id)
+		record.Set("action", "start")
+		record.Set("occuredAt", e.Record.GetDateTime("lastStartTime"))
+
+		err = app.Save(record)
+		if err != nil {
+			return err
+		}
+
+		return e.Next()
+	})
+
+	// Verify if the created event is valid
 	app.OnRecordCreateRequest("session_events").BindFunc(func(e *core.RecordRequestEvent) error {
 		if e.HasSuperuserAuth() {
 			return e.Next()
@@ -81,9 +102,8 @@ func main() {
 		return e.Next()
 	})
 
+	// Update session when an event is created
 	app.OnRecordAfterCreateSuccess("session_events").BindFunc(func(e *core.RecordEvent) error {
-		// e.App
-		// e.Record
 		session, err := app.FindRecordById("sessions", e.Record.GetString("sessionId"))
 		if err != nil {
 			return err
