@@ -109,8 +109,8 @@ func main() {
 			return err
 		}
 
-		eventOccuredAt := e.Record.GetDateTime("occuredAt")
-		lastStartTime := session.GetDateTime("lastStartTime")
+		eventOccuredAt := e.Record.GetDateTime("occuredAt").Time().UTC()
+		lastStartTime := session.GetDateTime("lastStartTime").Time().UTC()
 
 		switch e.Record.GetString("action") {
 		case "start":
