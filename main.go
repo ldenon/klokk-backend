@@ -123,11 +123,13 @@ func main() {
 			newTotal := int64(session.GetInt("totalTime")) + duration
 			session.Set("totalTime", newTotal)
 		case "stop":
-			session.Set("status", "completed")
 			// Update total duration
-			duration := eventOccuredAt.Sub(lastStartTime).Milliseconds()
-			newTotal := int64(session.GetInt("totalTime")) + duration
-			session.Set("totalTime", newTotal)
+			if session.GetString("status") == "active" {
+				duration := eventOccuredAt.Sub(lastStartTime).Milliseconds()
+				newTotal := int64(session.GetInt("totalTime")) + duration
+				session.Set("totalTime", newTotal)
+			}
+			session.Set("status", "completed")
 		}
 
 		e.App.Save(session)
