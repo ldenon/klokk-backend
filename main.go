@@ -3,12 +3,22 @@ package main
 import (
 	_ "backend/pb_migrations"
 	"log"
+	"net/http"
 
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase"
+	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
+	"github.com/pocketbase/pocketbase/tools/types"
 )
+
+type SessionEvent struct {
+	Id        string         `db:"id" json:"id"`
+	SessionId string         `db:"sessionId" json:"sessionId"`
+	Action    string         `db:"action" json:"action"`
+	OccuredAt types.DateTime `db:"occuredAt" json:"occuredAt"`
+}
 
 func main() {
 	app := pocketbase.New()
@@ -18,10 +28,57 @@ func main() {
 	})
 
 	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
-		// registers new "GET /hello" route
-		se.Router.GET("/hello", func(re *core.RequestEvent) error {
-			return re.String(200, "Hello world!")
-		})
+		// Recalculate a session's time
+		se.Router.POST("/api/klokk/sessions/{id}/refresh", func(re *core.RequestEvent) error {
+			id := re.Request.PathValue("id")
+
+			session, err := re.App.FindRecordById("sessions", id)
+
+			if err != nil {
+				return re.BadRequestError("No session found.", nil)
+			}
+
+			events := []SessionEvent{}
+
+			err = re.App.DB().NewQuery("SELECT id, sessionId, action, occuredAt FROM session_events WHERE sessionId = {:sessionId} ORDER BY occuredAt ASC").Bind(dbx.Params{
+				"sessionId": session.Id,
+			}).All(&events)
+
+			if err != nil {
+				return re.InternalServerError("An error occured.", err)
+			}
+
+			var lastStartTime types.DateTime
+			var totalTime int64 = 0
+			var lastAction string
+
+			for _, event := range events {
+				if event.Action == "start" {
+					lastStartTime = event.OccuredAt
+					lastAction = "start"
+				}
+
+				if (event.Action == "pause" || event.Action == "stop") && lastAction == "start" {
+					if !lastStartTime.IsZero() {
+						duration := event.OccuredAt.Time().Sub(lastStartTime.Time()).Milliseconds()
+						totalTime += duration
+					}
+					lastAction = event.Action
+					lastStartTime = types.DateTime{}
+				}
+			}
+
+			session.Set("totalTime", totalTime)
+			err = re.App.Save(session)
+			if err != nil {
+				return re.InternalServerError("Failed to update session.", err)
+			}
+
+			return re.JSON(http.StatusOK, map[string]interface{}{
+				"totalTime": totalTime,
+			})
+
+		}).Bind(apis.RequireAuth())
 
 		return se.Next()
 	})

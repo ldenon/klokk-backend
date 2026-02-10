@@ -886,7 +886,7 @@ func init() {
 			},
 			{
 				"createRule": "@request.auth.id != \"\" && @request.auth.id = sessionId.owner && \n(\n(action = \"start\" && sessionId.status = \"paused\") || \n(action = \"pause\" && sessionId.status = \"active\") ||\n(action = \"stop\" && sessionId.status != \"completed\") \n)",
-				"deleteRule": null,
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = sessionId.owner",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -983,7 +983,7 @@ func init() {
 			},
 			{
 				"createRule": "@request.auth.id != \"\"",
-				"deleteRule": null,
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = owner",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
