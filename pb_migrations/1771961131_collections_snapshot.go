@@ -783,7 +783,7 @@ func init() {
 				"viewRule": "id = @request.auth.id"
 			},
 			{
-				"createRule": null,
+				"createRule": "@request.auth.id != \"\" && name:length > 1",
 				"deleteRule": null,
 				"fields": [
 					{
