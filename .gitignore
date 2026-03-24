@@ -18,6 +18,7 @@ go.work
 
 # PocketBase data directory
 pb_data/
+migrations/
 
 # PocketBase executable (if downloaded)
 pocketbase

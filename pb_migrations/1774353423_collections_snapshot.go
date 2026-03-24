@@ -1101,6 +1101,19 @@ func init() {
 						"type": "number"
 					},
 					{
+						"cascadeDelete": false,
+						"collectionId": "pbc_28645432",
+						"hidden": false,
+						"id": "relation1874629670",
+						"maxSelect": 999,
+						"minSelect": 0,
+						"name": "tags",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "relation"
+					},
+					{
 						"hidden": false,
 						"id": "autodate2990389176",
 						"name": "created",
