@@ -6,6 +6,12 @@ import (
 )
 
 func registerProjectHooks(app *pocketbase.PocketBase) {
+	app.OnRecordCreateRequest("projects").BindFunc(func(e *core.RecordRequestEvent) error {
+		e.Record.Set("owner", e.Auth.Id)
+
+		return e.Next()
+	})
+
 	app.OnRecordAfterCreateSuccess("users").BindFunc(func(e *core.RecordEvent) error {
 		collection, err := app.FindCollectionByNameOrId("projects")
 		if err != nil {
