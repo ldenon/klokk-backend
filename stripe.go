@@ -14,6 +14,11 @@ import (
 	"github.com/stripe/stripe-go/v85/webhook"
 )
 
+var (
+	WHSEC              string
+	STRIPE_SUCCESS_URL string
+)
+
 func registerStripeRoutes(app *pocketbase.PocketBase) {
 
 	err := godotenv.Load()
@@ -22,6 +27,8 @@ func registerStripeRoutes(app *pocketbase.PocketBase) {
 	}
 
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
+	WHSEC = os.Getenv("STRIPE_SECRET_KEY")
+	STRIPE_SUCCESS_URL = os.Getenv("STRIPE_SUCCESS_URL")
 
 	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
 
@@ -42,7 +49,7 @@ func handleStripeWebhook(e *core.RequestEvent) error {
 	signatureHeader := e.Request.Header.Get("Stripe-Signature")
 	e.App.Logger().Info(signatureHeader)
 
-	event, err := webhook.ConstructEvent(payload, signatureHeader, "whsec_c7c285f434faff6a503133f55dabf7ba43b29e73a13f9d3e7e306c85d3daafee")
+	event, err := webhook.ConstructEvent(payload, signatureHeader, WHSEC)
 	if err != nil {
 		return e.BadRequestError("Webhook verification failed", nil)
 	}
@@ -66,8 +73,6 @@ func handleCreateCheckoutSession(e *core.RequestEvent) error {
 		return e.UnauthorizedError("User not authenticated", nil)
 	}
 
-	domain := "http://localhost:3000/"
-
 	params := &stripe.CheckoutSessionParams{
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
@@ -77,7 +82,7 @@ func handleCreateCheckoutSession(e *core.RequestEvent) error {
 			},
 		},
 		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL: stripe.String(domain + "?success=true"),
+		SuccessURL: stripe.String(STRIPE_SUCCESS_URL + "?success=true"),
 		Metadata: map[string]string{
 			"userId": info.Auth.Id,
 		},
