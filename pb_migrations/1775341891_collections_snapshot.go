@@ -855,7 +855,7 @@ func init() {
 						"type": "relation"
 					},
 					{
-						"cascadeDelete": false,
+						"cascadeDelete": true,
 						"collectionId": "_pb_users_auth_",
 						"hidden": false,
 						"id": "relation3479234172",
@@ -1088,7 +1088,7 @@ func init() {
 						"type": "relation"
 					},
 					{
-						"cascadeDelete": false,
+						"cascadeDelete": true,
 						"collectionId": "_pb_users_auth_",
 						"hidden": false,
 						"id": "relation3479234172",
@@ -1181,7 +1181,7 @@ func init() {
 			},
 			{
 				"createRule": "@request.auth.id != \"\" && @request.auth.id = project.owner && name:length > 1",
-				"deleteRule": null,
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = project.owner",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -1212,7 +1212,7 @@ func init() {
 						"type": "text"
 					},
 					{
-						"cascadeDelete": false,
+						"cascadeDelete": true,
 						"collectionId": "pbc_484305853",
 						"hidden": false,
 						"id": "relation800313582",
@@ -1223,6 +1223,28 @@ func init() {
 						"required": false,
 						"system": false,
 						"type": "relation"
+					},
+					{
+						"hidden": false,
+						"id": "select1716930793",
+						"maxSelect": 1,
+						"name": "color",
+						"presentable": false,
+						"required": true,
+						"system": false,
+						"type": "select",
+						"values": [
+							"default",
+							"gray",
+							"brown",
+							"orange",
+							"yellow",
+							"green",
+							"blue",
+							"purple",
+							"pink",
+							"red"
+						]
 					},
 					{
 						"hidden": false,
@@ -1251,7 +1273,7 @@ func init() {
 				"name": "project_tags",
 				"system": false,
 				"type": "base",
-				"updateRule": null,
+				"updateRule": "@request.auth.id != \"\" && @request.auth.id = project.owner && name:length > 1",
 				"viewRule": null
 			},
 			{
@@ -1273,7 +1295,7 @@ func init() {
 						"type": "text"
 					},
 					{
-						"cascadeDelete": false,
+						"cascadeDelete": true,
 						"collectionId": "_pb_users_auth_",
 						"hidden": false,
 						"id": "relation2375276105",
@@ -1281,7 +1303,7 @@ func init() {
 						"minSelect": 0,
 						"name": "user",
 						"presentable": false,
-						"required": true,
+						"required": false,
 						"system": false,
 						"type": "relation"
 					},
@@ -1309,7 +1331,7 @@ func init() {
 						"type": "bool"
 					},
 					{
-						"cascadeDelete": false,
+						"cascadeDelete": true,
 						"collectionId": "pbc_484305853",
 						"hidden": false,
 						"id": "relation800313582",

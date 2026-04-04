@@ -38,9 +38,9 @@ func registerProjectHooks(app *pocketbase.PocketBase) {
 		}
 
 		taskNames := []string{
-			"Welcome to Klokk!",
-			"You can start a session directly from a task",
-			"Tag sessions to organize projects",
+			"Welcome to Klokk! 👋",
+			"Start a session instantly from a task 📋",
+			"Tag sessions to organize projects 🏌🏻",
 		}
 
 		for _, name := range taskNames {
