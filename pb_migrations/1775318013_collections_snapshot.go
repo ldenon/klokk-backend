@@ -716,6 +716,20 @@ func init() {
 						"type": "relation"
 					},
 					{
+						"autogeneratePattern": "[a-z0-9]{15}",
+						"hidden": true,
+						"id": "text4051687333",
+						"max": 15,
+						"min": 15,
+						"name": "customerId",
+						"pattern": "^[a-z0-9]+$",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
 						"hidden": false,
 						"id": "autodate2990389176",
 						"name": "created",
@@ -866,6 +880,15 @@ func init() {
 						"required": false,
 						"system": false,
 						"type": "text"
+					},
+					{
+						"hidden": false,
+						"id": "bool3946532403",
+						"name": "deleted",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "bool"
 					},
 					{
 						"hidden": false,

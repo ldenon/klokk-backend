@@ -3,8 +3,10 @@ module backend
 go 1.25.6
 
 require (
+	github.com/joho/godotenv v1.5.1
 	github.com/pocketbase/dbx v1.11.0
 	github.com/pocketbase/pocketbase v0.36.1
+	github.com/stripe/stripe-go/v85 v85.0.0
 )
 
 require (

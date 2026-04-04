@@ -18,6 +18,7 @@ func main() {
 	registerSessionRoutes(app)
 	registerSessionHooks(app)
 	registerProjectHooks(app)
+	registerStripeRoutes(app)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)

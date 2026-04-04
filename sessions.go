@@ -20,7 +20,7 @@ type SessionEvent struct {
 func registerSessionRoutes(app *pocketbase.PocketBase) {
 	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
 		// Recalculate a session's time
-		se.Router.POST("/api/klokk/sessions/{id}/refresh", func(re *core.RequestEvent) error {
+		se.Router.POST("/api/sessions/{id}/refresh", func(re *core.RequestEvent) error {
 			id := re.Request.PathValue("id")
 
 			session, err := re.App.FindRecordById("sessions", id)
