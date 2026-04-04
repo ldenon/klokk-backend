@@ -18,7 +18,7 @@ func registerStripeRoutes(app *pocketbase.PocketBase) {
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		app.Logger().Error(err.Error())
 	}
 
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
