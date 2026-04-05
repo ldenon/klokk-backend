@@ -35,9 +35,6 @@ func registerStripeRoutes(app *pocketbase.PocketBase) {
 	STRIPE_SUCCESS_URL = os.Getenv("STRIPE_SUCCESS_URL")
 	STRIPE_LIFETIME_PRICE_ID = os.Getenv("STRIPE_LIFETIME_PRICE_ID")
 
-	app.Logger().Info(STRIPE_SUCCESS_URL)
-	app.Logger().Info(STRIPE_LIFETIME_PRICE_ID)
-
 	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
 
 		se.Router.POST("/api/stripe", handleStripeWebhook)

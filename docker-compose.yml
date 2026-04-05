@@ -12,6 +12,10 @@ services:
       - pb_data:/pb/pb_data
     environment:
       - POCKETBASE_PORT_NUMBER=8090
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - WHSEC=${WHSEC}
+      - STRIPE_SUCCESS_URL=${STRIPE_SUCCESS_URL}
+      - STRIPE_LIFETIME_PRICE_ID=${STRIPE_LIFETIME_PRICE_ID}
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8090/_/"]
       interval: 30s
