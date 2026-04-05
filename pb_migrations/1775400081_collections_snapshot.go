@@ -716,20 +716,6 @@ func init() {
 						"type": "relation"
 					},
 					{
-						"autogeneratePattern": "[a-z0-9]{15}",
-						"hidden": true,
-						"id": "text4051687333",
-						"max": 15,
-						"min": 15,
-						"name": "customerId",
-						"pattern": "^[a-z0-9]+$",
-						"presentable": false,
-						"primaryKey": false,
-						"required": false,
-						"system": false,
-						"type": "text"
-					},
-					{
 						"hidden": false,
 						"id": "autodate2990389176",
 						"name": "created",
@@ -918,7 +904,7 @@ func init() {
 				"system": false,
 				"type": "base",
 				"updateRule": "@request.auth.id != \"\" && @request.auth.id = owner",
-				"viewRule": "@request.auth.id != \"\""
+				"viewRule": "@request.auth.id != \"\" && @request.auth.id = owner"
 			},
 			{
 				"createRule": "@request.auth.id != \"\" && @request.auth.id = sessionId.owner && \n(\n(action = \"start\" && sessionId.status = \"paused\") || \n(action = \"pause\" && sessionId.status = \"active\") ||\n(action = \"stop\" && sessionId.status != \"completed\") \n)",
@@ -1371,6 +1357,212 @@ func init() {
 				"system": false,
 				"type": "base",
 				"updateRule": "@request.auth.id != \"\" && @request.auth.id = project.owner",
+				"viewRule": null
+			},
+			{
+				"createRule": null,
+				"deleteRule": null,
+				"fields": [
+					{
+						"autogeneratePattern": "[a-z0-9]{15}",
+						"hidden": false,
+						"id": "text3208210256",
+						"max": 15,
+						"min": 15,
+						"name": "id",
+						"pattern": "^[a-z0-9]+$",
+						"presentable": false,
+						"primaryKey": true,
+						"required": true,
+						"system": true,
+						"type": "text"
+					},
+					{
+						"cascadeDelete": false,
+						"collectionId": "_pb_users_auth_",
+						"hidden": false,
+						"id": "relation2375276105",
+						"maxSelect": 1,
+						"minSelect": 0,
+						"name": "user",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "relation"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text3277192334",
+						"max": 0,
+						"min": 0,
+						"name": "stripeId",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"hidden": false,
+						"id": "autodate2990389176",
+						"name": "created",
+						"onCreate": true,
+						"onUpdate": false,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					},
+					{
+						"hidden": false,
+						"id": "autodate3332085495",
+						"name": "updated",
+						"onCreate": true,
+						"onUpdate": true,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					}
+				],
+				"id": "pbc_108570809",
+				"indexes": [
+					"CREATE UNIQUE INDEX ` + "`" + `idx_cwd5YqgAMp` + "`" + ` ON ` + "`" + `customers` + "`" + ` (\n  ` + "`" + `user` + "`" + `,\n  ` + "`" + `stripeId` + "`" + `\n)"
+				],
+				"listRule": null,
+				"name": "customers",
+				"system": false,
+				"type": "base",
+				"updateRule": null,
+				"viewRule": null
+			},
+			{
+				"createRule": null,
+				"deleteRule": null,
+				"fields": [
+					{
+						"autogeneratePattern": "[a-z0-9]{15}",
+						"hidden": false,
+						"id": "text3208210256",
+						"max": 15,
+						"min": 15,
+						"name": "id",
+						"pattern": "^[a-z0-9]+$",
+						"presentable": false,
+						"primaryKey": true,
+						"required": true,
+						"system": true,
+						"type": "text"
+					},
+					{
+						"cascadeDelete": false,
+						"collectionId": "_pb_users_auth_",
+						"hidden": false,
+						"id": "relation2375276105",
+						"maxSelect": 1,
+						"minSelect": 0,
+						"name": "user",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "relation"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text1484822388",
+						"max": 0,
+						"min": 0,
+						"name": "stripeSubscriptionId",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text837031339",
+						"max": 0,
+						"min": 0,
+						"name": "stripePriceId",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"hidden": false,
+						"id": "select2363381545",
+						"maxSelect": 1,
+						"name": "type",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "select",
+						"values": [
+							"lifetime",
+							"reccuring"
+						]
+					},
+					{
+						"hidden": false,
+						"id": "select2063623452",
+						"maxSelect": 1,
+						"name": "status",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "select",
+						"values": [
+							"active",
+							"past_due",
+							"canceled"
+						]
+					},
+					{
+						"hidden": false,
+						"id": "date730627375",
+						"max": "",
+						"min": "",
+						"name": "expiresAt",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "date"
+					},
+					{
+						"hidden": false,
+						"id": "autodate2990389176",
+						"name": "created",
+						"onCreate": true,
+						"onUpdate": false,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					},
+					{
+						"hidden": false,
+						"id": "autodate3332085495",
+						"name": "updated",
+						"onCreate": true,
+						"onUpdate": true,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					}
+				],
+				"id": "pbc_3980638064",
+				"indexes": [],
+				"listRule": "@request.auth.id != \"\" && @request.auth.id = user",
+				"name": "subscriptions",
+				"system": false,
+				"type": "base",
+				"updateRule": null,
 				"viewRule": null
 			}
 		]`
