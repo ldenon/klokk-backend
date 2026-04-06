@@ -854,20 +854,6 @@ func init() {
 						"type": "relation"
 					},
 					{
-						"autogeneratePattern": "",
-						"hidden": false,
-						"id": "text1716930793",
-						"max": 0,
-						"min": 0,
-						"name": "color",
-						"pattern": "",
-						"presentable": false,
-						"primaryKey": false,
-						"required": false,
-						"system": false,
-						"type": "text"
-					},
-					{
 						"hidden": false,
 						"id": "bool3946532403",
 						"name": "deleted",
@@ -907,8 +893,8 @@ func init() {
 				"viewRule": "@request.auth.id != \"\" && @request.auth.id = owner"
 			},
 			{
-				"createRule": "@request.auth.id != \"\" && @request.auth.id = sessionId.owner && \n(\n(action = \"start\" && sessionId.status = \"paused\") || \n(action = \"pause\" && sessionId.status = \"active\") ||\n(action = \"stop\" && sessionId.status != \"completed\") \n)",
-				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = sessionId.owner",
+				"createRule": "@request.auth.id != \"\" && @request.auth.id = session.owner && \n(\n(action = \"start\" && session.status = \"paused\") || \n(action = \"pause\" && session.status = \"active\") ||\n(action = \"stop\" && session.status != \"completed\") \n)",
+				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = session.owner",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -957,21 +943,11 @@ func init() {
 						"id": "relation961590774",
 						"maxSelect": 1,
 						"minSelect": 0,
-						"name": "sessionId",
+						"name": "session",
 						"presentable": false,
 						"required": true,
 						"system": false,
 						"type": "relation"
-					},
-					{
-						"hidden": false,
-						"id": "json1326724116",
-						"maxSize": 0,
-						"name": "metadata",
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "json"
 					},
 					{
 						"hidden": false,
@@ -1101,26 +1077,26 @@ func init() {
 					},
 					{
 						"hidden": false,
-						"id": "date1526117242",
-						"max": "",
-						"min": "",
-						"name": "lastStartTime",
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "date"
-					},
-					{
-						"hidden": false,
 						"id": "number723676812",
 						"max": null,
 						"min": 0,
-						"name": "totalTime",
+						"name": "duration",
 						"onlyInt": true,
 						"presentable": false,
 						"required": false,
 						"system": false,
 						"type": "number"
+					},
+					{
+						"hidden": false,
+						"id": "date2109428701",
+						"max": "",
+						"min": "",
+						"name": "activeSince",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "date"
 					},
 					{
 						"cascadeDelete": false,
@@ -1560,6 +1536,89 @@ func init() {
 				"indexes": [],
 				"listRule": "@request.auth.id != \"\" && @request.auth.id = user",
 				"name": "subscriptions",
+				"system": false,
+				"type": "base",
+				"updateRule": null,
+				"viewRule": null
+			},
+			{
+				"createRule": null,
+				"deleteRule": null,
+				"fields": [
+					{
+						"autogeneratePattern": "[a-z0-9]{15}",
+						"hidden": false,
+						"id": "text3208210256",
+						"max": 15,
+						"min": 15,
+						"name": "id",
+						"pattern": "^[a-z0-9]+$",
+						"presentable": false,
+						"primaryKey": true,
+						"required": true,
+						"system": true,
+						"type": "text"
+					},
+					{
+						"cascadeDelete": true,
+						"collectionId": "pbc_3660498186",
+						"hidden": false,
+						"id": "relation3494172116",
+						"maxSelect": 1,
+						"minSelect": 0,
+						"name": "session",
+						"presentable": false,
+						"required": true,
+						"system": false,
+						"type": "relation"
+					},
+					{
+						"hidden": false,
+						"id": "date2393256231",
+						"max": "",
+						"min": "",
+						"name": "startTime",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "date"
+					},
+					{
+						"hidden": false,
+						"id": "date4098681852",
+						"max": "",
+						"min": "",
+						"name": "endTime",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "date"
+					},
+					{
+						"hidden": false,
+						"id": "autodate2990389176",
+						"name": "created",
+						"onCreate": true,
+						"onUpdate": false,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					},
+					{
+						"hidden": false,
+						"id": "autodate3332085495",
+						"name": "updated",
+						"onCreate": true,
+						"onUpdate": true,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					}
+				],
+				"id": "pbc_3381612487",
+				"indexes": [],
+				"listRule": null,
+				"name": "session_intervals",
 				"system": false,
 				"type": "base",
 				"updateRule": null,

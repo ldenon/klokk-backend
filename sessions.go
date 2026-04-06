@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/pocketbase/dbx"
@@ -12,9 +13,50 @@ import (
 
 type SessionEvent struct {
 	Id        string         `db:"id" json:"id"`
-	SessionId string         `db:"sessionId" json:"sessionId"`
+	Session   string         `db:"session" json:"session"`
 	Action    string         `db:"action" json:"action"`
 	OccuredAt types.DateTime `db:"occuredAt" json:"occuredAt"`
+}
+
+type SessionInterval struct {
+	Id        string         `db:"id" json:"id"`
+	Session   string         `db:"session" json:"session"`
+	StartTime types.DateTime `db:"startTime" json:"startTime"`
+	EndTime   types.DateTime `db:"endTime" json:"endTime"`
+}
+
+func closeLatestSessionInterval(app core.App, sessionId string, endTime types.DateTime) (int64, error) {
+	intervals, err := app.FindRecordsByFilter(
+		"session_intervals",
+		"session = {:session}",
+		"-startTime",
+		1,
+		0,
+		dbx.Params{"session": sessionId},
+	)
+	if err != nil {
+		return 0, err
+	}
+	if len(intervals) == 0 {
+		return 0, errors.New("no session interval found")
+	}
+
+	interval := intervals[0]
+	if !interval.GetDateTime("endTime").IsZero() {
+		return 0, errors.New("session interval already closed")
+	}
+
+	startTime := interval.GetDateTime("startTime")
+	if startTime.IsZero() {
+		return 0, errors.New("session interval missing start time")
+	}
+
+	interval.Set("endTime", endTime)
+	if err := app.Save(interval); err != nil {
+		return 0, err
+	}
+
+	return endTime.Time().UTC().Sub(startTime.Time().UTC()).Milliseconds(), nil
 }
 
 func registerSessionRoutes(app *pocketbase.PocketBase) {
@@ -28,42 +70,32 @@ func registerSessionRoutes(app *pocketbase.PocketBase) {
 				return re.BadRequestError("No session found.", nil)
 			}
 
-			events := []SessionEvent{}
-			err = re.App.DB().NewQuery("SELECT id, sessionId, action, occuredAt FROM session_events WHERE sessionId = {:sessionId} ORDER BY occuredAt ASC").Bind(dbx.Params{
-				"sessionId": session.Id,
-			}).All(&events)
+			intervals := []SessionInterval{}
+			err = re.App.DB().NewQuery("SELECT id, session, startTime, endTime FROM session_intervals WHERE session = {:session} ORDER BY startTime ASC").Bind(dbx.Params{
+				"session": session.Id,
+			}).All(&intervals)
 			if err != nil {
 				return re.InternalServerError("An error occured.", err)
 			}
 
-			var lastStartTime types.DateTime
-			var totalTime int64 = 0
-			var lastAction string
+			var totalDuration int64 = 0
 
-			for _, event := range events {
-				if event.Action == "start" {
-					lastStartTime = event.OccuredAt
-					lastAction = "start"
+			for _, interval := range intervals {
+				if interval.StartTime.IsZero() || interval.EndTime.IsZero() {
+					continue
 				}
-
-				if (event.Action == "pause" || event.Action == "stop") && lastAction == "start" {
-					if !lastStartTime.IsZero() {
-						duration := event.OccuredAt.Time().Sub(lastStartTime.Time()).Milliseconds()
-						totalTime += duration
-					}
-					lastAction = event.Action
-					lastStartTime = types.DateTime{}
-				}
+				intervalDuration := interval.EndTime.Time().Sub(interval.StartTime.Time()).Milliseconds()
+				totalDuration += intervalDuration
 			}
 
-			session.Set("totalTime", totalTime)
+			session.Set("duration", totalDuration)
 			err = re.App.Save(session)
 			if err != nil {
 				return re.InternalServerError("Failed to update session.", err)
 			}
 
 			return re.JSON(http.StatusOK, map[string]interface{}{
-				"totalTime": totalTime,
+				"duration": totalDuration,
 			})
 		}).Bind(apis.RequireAuth())
 
@@ -101,10 +133,18 @@ func registerSessionHooks(app *pocketbase.PocketBase) {
 			return err
 		}
 		record := core.NewRecord(collection)
+		startAt := e.Record.GetDateTime("activeSince")
+		if startAt.IsZero() {
+			startAt = types.NowDateTime()
+			e.Record.Set("activeSince", startAt)
+			if err := e.App.Save(e.Record); err != nil {
+				return err
+			}
+		}
 
-		record.Set("sessionId", e.Record.Id)
+		record.Set("session", e.Record.Id)
 		record.Set("action", "start")
-		record.Set("occuredAt", e.Record.GetDateTime("lastStartTime"))
+		record.Set("occuredAt", startAt)
 
 		err = app.Save(record)
 		if err != nil {
@@ -120,14 +160,14 @@ func registerSessionHooks(app *pocketbase.PocketBase) {
 			return e.Next()
 		}
 
-		sessionId := e.Record.GetString("sessionId")
+		session := e.Record.GetString("session")
 		events, err := e.App.FindRecordsByFilter(
 			"session_events",
-			"sessionId = {:sessionId}",
+			"session = {:session}",
 			"-occuredAt",
 			1,
 			0,
-			dbx.Params{"sessionId": sessionId},
+			dbx.Params{"session": session},
 		)
 		if err != nil {
 			return e.InternalServerError("Internal server error.", err)
@@ -148,35 +188,51 @@ func registerSessionHooks(app *pocketbase.PocketBase) {
 
 	// Update session when an event is created
 	app.OnRecordAfterCreateSuccess("session_events").BindFunc(func(e *core.RecordEvent) error {
-		session, err := app.FindRecordById("sessions", e.Record.GetString("sessionId"))
+		session, err := app.FindRecordById("sessions", e.Record.GetString("session"))
 		if err != nil {
 			return err
 		}
 
-		eventOccuredAt := e.Record.GetDateTime("occuredAt").Time().UTC()
-		lastStartTime := session.GetDateTime("lastStartTime").Time().UTC()
+		eventOccuredAt := e.Record.GetDateTime("occuredAt")
 
 		switch e.Record.GetString("action") {
 		case "start":
 			session.Set("status", "active")
-			session.Set("lastStartTime", eventOccuredAt)
+			session.Set("activeSince", eventOccuredAt)
+
+			intervalCollection, err := e.App.FindCollectionByNameOrId("session_intervals")
+			if err != nil {
+				return err
+			}
+			interval := core.NewRecord(intervalCollection)
+			interval.Set("session", session.Id)
+			interval.Set("startTime", eventOccuredAt)
+
+			if err := e.App.Save(interval); err != nil {
+				return err
+			}
 		case "pause":
 			session.Set("status", "paused")
-			// Update total duration
-			duration := eventOccuredAt.Sub(lastStartTime).Milliseconds()
-			newTotal := int64(session.GetInt("totalTime")) + duration
-			session.Set("totalTime", newTotal)
+
+			duration, err := closeLatestSessionInterval(e.App, session.Id, eventOccuredAt)
+			if err != nil {
+				return err
+			}
+			session.Set("duration", int64(session.GetInt("duration"))+duration)
 		case "stop":
-			// Update total duration
 			if session.GetString("status") == "active" {
-				duration := eventOccuredAt.Sub(lastStartTime).Milliseconds()
-				newTotal := int64(session.GetInt("totalTime")) + duration
-				session.Set("totalTime", newTotal)
+				duration, err := closeLatestSessionInterval(e.App, session.Id, eventOccuredAt)
+				if err != nil {
+					return err
+				}
+				session.Set("duration", int64(session.GetInt("duration"))+duration)
 			}
 			session.Set("status", "completed")
 		}
 
-		e.App.Save(session)
+		if err := e.App.Save(session); err != nil {
+			return err
+		}
 
 		return e.Next()
 	})
