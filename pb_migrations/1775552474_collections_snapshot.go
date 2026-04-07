@@ -1284,15 +1284,6 @@ func init() {
 						"type": "text"
 					},
 					{
-						"hidden": false,
-						"id": "bool271442091",
-						"name": "done",
-						"presentable": false,
-						"required": false,
-						"system": false,
-						"type": "bool"
-					},
-					{
 						"cascadeDelete": true,
 						"collectionId": "pbc_484305853",
 						"hidden": false,
@@ -1304,6 +1295,46 @@ func init() {
 						"required": true,
 						"system": false,
 						"type": "relation"
+					},
+					{
+						"cascadeDelete": false,
+						"collectionId": "pbc_28645432",
+						"hidden": false,
+						"id": "relation1874629670",
+						"maxSelect": 999,
+						"minSelect": 0,
+						"name": "tags",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "relation"
+					},
+					{
+						"hidden": false,
+						"id": "select2063623452",
+						"maxSelect": 1,
+						"name": "status",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "select",
+						"values": [
+							"open",
+							"inprogress",
+							"done",
+							"archived"
+						]
+					},
+					{
+						"hidden": false,
+						"id": "date1718663312",
+						"max": "",
+						"min": "",
+						"name": "completedAt",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "date"
 					},
 					{
 						"hidden": false,

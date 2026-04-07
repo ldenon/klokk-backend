@@ -76,7 +76,7 @@ func registerProjectHooks(app *pocketbase.PocketBase) {
 		}
 
 		project := core.NewRecord(collection)
-		project.Set("name", "Personal")
+		project.Set("name", "Getting started 👋")
 		project.Set("owner", e.Record.Id)
 
 		if err := app.Save(project); err != nil {
@@ -96,7 +96,7 @@ func registerProjectHooks(app *pocketbase.PocketBase) {
 		taskNames := []string{
 			"Welcome to Klokk! 👋",
 			"Start a session instantly from a task 📋",
-			"Tag sessions to organize projects 🏌🏻",
+			"Use tags to organize your projects 🏌🏻",
 		}
 
 		for _, name := range taskNames {
