@@ -894,7 +894,7 @@ func init() {
 			},
 			{
 				"createRule": "@request.auth.id != \"\" && @request.auth.id = session.owner && \n(\n(action = \"start\" && session.status = \"paused\") || \n(action = \"pause\" && session.status = \"active\") ||\n(action = \"stop\" && session.status != \"completed\") \n)",
-				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = session.owner",
+				"deleteRule": null,
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -1648,11 +1648,11 @@ func init() {
 				],
 				"id": "pbc_3381612487",
 				"indexes": [],
-				"listRule": null,
+				"listRule": "@request.auth.id != \"\" && @request.auth.id = session.owner",
 				"name": "session_intervals",
 				"system": false,
 				"type": "base",
-				"updateRule": null,
+				"updateRule": "@request.auth.id != \"\" && @request.auth.id = session.owner ",
 				"viewRule": null
 			}
 		]`
