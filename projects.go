@@ -17,6 +17,8 @@ func registerProjectHooks(app *pocketbase.PocketBase) {
 			return e.UnauthorizedError("User not authenticated", nil)
 		}
 
+		// Free-forever rollout: disable subscription checks and project limits.
+		/*
 		hasLifetime, err := userHasActiveLifetime(e)
 		if err != nil {
 			return e.InternalServerError("Failed to check subscription", err)
@@ -30,6 +32,7 @@ func registerProjectHooks(app *pocketbase.PocketBase) {
 				return e.BadRequestError("Project limit reached", nil)
 			}
 		}
+		*/
 
 		e.Record.Set("owner", e.Auth.Id)
 
@@ -44,6 +47,8 @@ func registerProjectHooks(app *pocketbase.PocketBase) {
 			return e.UnauthorizedError("User not authenticated", nil)
 		}
 
+		// Free-forever rollout: disable subscription checks and tag limits.
+		/*
 		hasLifetime, err := userHasActiveLifetime(e)
 		if err != nil {
 			return e.InternalServerError("Failed to check subscription", err)
@@ -51,12 +56,14 @@ func registerProjectHooks(app *pocketbase.PocketBase) {
 		if hasLifetime {
 			return e.Next()
 		}
+		*/
 
 		projectId := e.Record.GetString("project")
 		if projectId == "" {
 			return e.BadRequestError("Project is required", nil)
 		}
 
+		/*
 		count, err := e.App.CountRecords("project_tags", dbx.HashExp{"project": projectId})
 		if err != nil {
 			return e.InternalServerError("Failed to count project tags", err)
@@ -64,6 +71,7 @@ func registerProjectHooks(app *pocketbase.PocketBase) {
 		if count >= 10 {
 			return e.BadRequestError("Tag limit reached", nil)
 		}
+		*/
 
 		return e.Next()
 	})
