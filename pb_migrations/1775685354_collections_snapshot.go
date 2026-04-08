@@ -885,12 +885,12 @@ func init() {
 				],
 				"id": "pbc_484305853",
 				"indexes": [],
-				"listRule": "@request.auth.id != \"\" && @request.auth.id = owner",
+				"listRule": "@request.auth.id != \"\" && (@request.auth.id = owner || @request.auth.id ?= members.id)",
 				"name": "projects",
 				"system": false,
 				"type": "base",
 				"updateRule": "@request.auth.id != \"\" && @request.auth.id = owner",
-				"viewRule": "@request.auth.id != \"\" && @request.auth.id = owner"
+				"viewRule": "@request.auth.id != \"\" &&( @request.auth.id = owner || @request.auth.id ?= members.id)"
 			},
 			{
 				"createRule": "@request.auth.id != \"\" && @request.auth.id = session.owner && \n(\n(action = \"start\" && session.status = \"paused\") || \n(action = \"pause\" && session.status = \"active\") ||\n(action = \"stop\" && session.status != \"completed\") \n)",
@@ -980,7 +980,7 @@ func init() {
 				"viewRule": null
 			},
 			{
-				"createRule": "@request.auth.id != \"\"",
+				"createRule": "@request.auth.id != \"\" && (@request.auth.id = project.owner || @request.auth.id ?= project.members.id)",
 				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = owner",
 				"fields": [
 					{
@@ -1067,9 +1067,9 @@ func init() {
 						"collectionId": "pbc_484305853",
 						"hidden": false,
 						"id": "relation1553183652",
-						"maxSelect": 999,
+						"maxSelect": 1,
 						"minSelect": 0,
-						"name": "projects",
+						"name": "project",
 						"presentable": false,
 						"required": false,
 						"system": false,
@@ -1134,7 +1134,7 @@ func init() {
 				],
 				"id": "pbc_3660498186",
 				"indexes": [],
-				"listRule": "@request.auth.id != \"\" && (@request.auth.id = owner || participants ~ @request.auth.id)",
+				"listRule": "@request.auth.id != \"\" && (@request.auth.id = project.owner || participants ~ @request.auth.id || @request.auth.id ?= project.members.id)",
 				"name": "sessions",
 				"system": false,
 				"type": "base",
@@ -1142,8 +1142,8 @@ func init() {
 				"viewRule": ""
 			},
 			{
-				"createRule": "@request.auth.id != \"\" && @request.auth.id = project.owner && name:length > 1",
-				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = project.owner",
+				"createRule": "@request.auth.id != \"\" &&  (@request.auth.id = project.owner || @request.auth.id ?= project.members.id) && name:length > 1",
+				"deleteRule": "@request.auth.id != \"\" &&  (@request.auth.id = project.owner || @request.auth.id ?= project.members.id)",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -1231,16 +1231,16 @@ func init() {
 				],
 				"id": "pbc_28645432",
 				"indexes": [],
-				"listRule": "@request.auth.id != \"\" && @request.auth.id = project.owner",
+				"listRule": "@request.auth.id != \"\" &&  (@request.auth.id = project.owner || @request.auth.id ?= project.members.id)",
 				"name": "project_tags",
 				"system": false,
 				"type": "base",
-				"updateRule": "@request.auth.id != \"\" && @request.auth.id = project.owner && name:length > 1",
+				"updateRule": "@request.auth.id != \"\" &&  (@request.auth.id = project.owner || @request.auth.id ?= project.members.id) && name:length > 1",
 				"viewRule": null
 			},
 			{
-				"createRule": "@request.auth.id != \"\" && @request.auth.id = project.owner",
-				"deleteRule": "@request.auth.id != \"\" && @request.auth.id = project.owner",
+				"createRule": "@request.auth.id != \"\" && (@request.auth.id = project.owner || @request.auth.id ?= project.members.id)",
+				"deleteRule": "@request.auth.id != \"\" && (@request.auth.id = project.owner || @request.auth.id ?= project.members.id)",
 				"fields": [
 					{
 						"autogeneratePattern": "[a-z0-9]{15}",
@@ -1359,11 +1359,11 @@ func init() {
 				],
 				"id": "pbc_2602490748",
 				"indexes": [],
-				"listRule": "@request.auth.id != \"\" && @request.auth.id = user",
+				"listRule": "@request.auth.id != \"\" && (@request.auth.id = project.owner || @request.auth.id ?= project.members.id)",
 				"name": "tasks",
 				"system": false,
 				"type": "base",
-				"updateRule": "@request.auth.id != \"\" && @request.auth.id = project.owner",
+				"updateRule": "@request.auth.id != \"\" &&  (@request.auth.id = project.owner || @request.auth.id ?= project.members.id)",
 				"viewRule": null
 			},
 			{
@@ -1653,6 +1653,145 @@ func init() {
 				"system": false,
 				"type": "base",
 				"updateRule": "@request.auth.id != \"\" && @request.auth.id = session.owner ",
+				"viewRule": null
+			},
+			{
+				"createRule": null,
+				"deleteRule": null,
+				"fields": [
+					{
+						"autogeneratePattern": "[a-z0-9]{15}",
+						"hidden": false,
+						"id": "text3208210256",
+						"max": 15,
+						"min": 15,
+						"name": "id",
+						"pattern": "^[a-z0-9]+$",
+						"presentable": false,
+						"primaryKey": true,
+						"required": true,
+						"system": true,
+						"type": "text"
+					},
+					{
+						"cascadeDelete": false,
+						"collectionId": "pbc_484305853",
+						"hidden": false,
+						"id": "relation800313582",
+						"maxSelect": 1,
+						"minSelect": 0,
+						"name": "project",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "relation"
+					},
+					{
+						"exceptDomains": [],
+						"hidden": false,
+						"id": "email3885137012",
+						"name": "email",
+						"onlyDomains": [],
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "email"
+					},
+					{
+						"hidden": false,
+						"id": "select1466534506",
+						"maxSelect": 1,
+						"name": "role",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "select",
+						"values": [
+							"default"
+						]
+					},
+					{
+						"autogeneratePattern": "",
+						"hidden": false,
+						"id": "text1597481275",
+						"max": 0,
+						"min": 0,
+						"name": "token",
+						"pattern": "",
+						"presentable": false,
+						"primaryKey": false,
+						"required": false,
+						"system": false,
+						"type": "text"
+					},
+					{
+						"hidden": false,
+						"id": "select2063623452",
+						"maxSelect": 1,
+						"name": "status",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "select",
+						"values": [
+							"pending",
+							"accepted",
+							"declined",
+							"expired"
+						]
+					},
+					{
+						"cascadeDelete": false,
+						"collectionId": "_pb_users_auth_",
+						"hidden": false,
+						"id": "relation3607751814",
+						"maxSelect": 1,
+						"minSelect": 0,
+						"name": "invitedBy",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "relation"
+					},
+					{
+						"hidden": false,
+						"id": "date951064219",
+						"max": "",
+						"min": "",
+						"name": "expiry",
+						"presentable": false,
+						"required": false,
+						"system": false,
+						"type": "date"
+					},
+					{
+						"hidden": false,
+						"id": "autodate2990389176",
+						"name": "created",
+						"onCreate": true,
+						"onUpdate": false,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					},
+					{
+						"hidden": false,
+						"id": "autodate3332085495",
+						"name": "updated",
+						"onCreate": true,
+						"onUpdate": true,
+						"presentable": false,
+						"system": false,
+						"type": "autodate"
+					}
+				],
+				"id": "pbc_2875048415",
+				"indexes": [],
+				"listRule": "@request.auth.id != \"\" && (@request.auth.email = email || @request.auth.id = invitedBy.id)",
+				"name": "project_invitations",
+				"system": false,
+				"type": "base",
+				"updateRule": null,
 				"viewRule": null
 			}
 		]`

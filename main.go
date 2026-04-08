@@ -18,6 +18,7 @@ func main() {
 	registerSessionRoutes(app)
 	registerSessionHooks(app)
 	registerProjectHooks(app)
+	registerInvitationRoutes(app)
 	// Pricing disabled: Stripe routes are temporarily turned off.
 	// registerStripeRoutes(app)
 
